@@ -18,9 +18,67 @@ half_add_sub.v	Arithmetic-circuit RTL
 half_add_sub_tb.v	Stimulus and VCD generation
 
 ### Verilog Program
+module half_adder (
+    input  wire A,
+    input  wire B,
+    output wire Sum,
+    output wire Carry
+);
+    assign Sum   = A ^ B;   // XOR
+    assign Carry = A & B;   // AND
+endmodule
+ 
+module half_subtractor (
+    input  wire A,
+    input  wire B,
+    output wire Diff,
+    output wire Borrow
+);
+    assign Diff   = A ^ B;      // XOR
+    assign Borrow = (~A) & B;  // A' . B
+endmodule
+
 ```
 ```
 ### Testbench Program
+module tb3;
+    reg A, B;
+    wire Sum, Carry;
+    wire Diff, Borrow;
+ 
+    // Instantiate the Half Adder
+    half_adder ha_uut (
+        .A(A),
+        .B(B),
+        .Sum(Sum),
+        .Carry(Carry)
+    );
+ 
+    // Instantiate the Half Subtractor
+    half_subtractor hs_uut (
+        .A(A),
+        .B(B),
+        .Diff(Diff),
+        .Borrow(Borrow)
+    );
+ 
+    initial begin
+        // ---- VCD dump setup ----
+        $dumpfile("half_add_sub.vcd");   // name of the VCD file to be generated
+        $dumpvars(0, tb3);                // dump all signals in this testbench hierarchy
+ 
+        // ---- Apply all 4 input combinations ----
+        $monitor("Time=%0t A=%b B=%b | Sum=%b Carry=%b | Diff=%b Borrow=%b",
+                   $time, A, B, Sum, Carry, Diff, Borrow);
+        A = 0; B = 0; #10;
+        A = 0; B = 1; #10;
+        A = 1; B = 0; #10;
+        A = 1; B = 1; #10;
+ 
+        #10 $finish;
+    end
+endmodule
+
 
 
 ### Truth Table
@@ -84,6 +142,10 @@ The Half Adder and Half Subtractor were realized using Verilog HDL:
 The design was compiled and simulated using Synopsys VCS, and the functionality was verified using DVE waveform analysis, matching the expected truth table.
 
 ### Output
+<img width="1845" height="997" alt="exp 3 (1)" src="https://github.com/user-attachments/assets/a9235280-a900-4922-8662-4bcb6c05b2c7" />
+<img width="1857" height="976" alt="exp 3 (2)" src="https://github.com/user-attachments/assets/4459c442-6124-4bb6-a7c7-c222d5c48000" />
+
+
 
 
 ### Viva-Voce Questions
